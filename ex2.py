@@ -126,7 +126,7 @@ def main():
     # generates graphs for x1,x2,x3,x4 and determines m1, m2
     generate_slopes(row_dictionary)
     # train(row_dictionary)
-    print("done")
+    print("done1")
 
 
 if __name__ == '__main__':
