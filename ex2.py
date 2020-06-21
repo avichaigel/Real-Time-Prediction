@@ -74,7 +74,7 @@ def read_data(row_dictionary):
     # create dictionary of the row of listOfNodes : anomaly
     row_number = 0
 
-    for i in range(REQUIRED_ROW_LENGTH ):
+    for i in range(REQUIRED_ROW_LENGTH):
         # anomaly = 0/1
         anomaly = anomalies[row_number]
         list_of_samples = []
@@ -100,12 +100,6 @@ def generate_slopes(row_dictionary):
             a2_list.append(sample.get_value2())
             a3_list.append(sample.get_value3())
             a4_list.append(sample.get_value4())
-            if len(a1_list) == 15:
-                plt.plot(a2_list, a1_list)
-                plt.show()
-                plt.plot(a4_list, a3_list)
-                plt.show()
-                plt.close()
         plt.plot(a2_list, a1_list)
         plt.show()
         plt.plot(a4_list, a3_list)
@@ -127,7 +121,7 @@ def main():
     # generates graphs for x1,x2,x3,x4 and determines m1, m2
     generate_slopes(row_dictionary)
     # train(row_dictionary)
-    print("done12")
+    print("done")
 
 
 if __name__ == '__main__':
