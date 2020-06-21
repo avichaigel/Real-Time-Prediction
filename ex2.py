@@ -118,7 +118,8 @@ def generate_slopes(row_dictionary):
 
 
 # def train(rows):
-    # gp.genetic.SymbolicRegressor(population_size=5, const_range=(-10,10), function_set=('add','sub'))
+    # gp.genetic.SymbolicRegressor(population_size=5, const_range=(-10,10), function_set=('add','sub'),
+#                                  )
 
 def main():
     row_dictionary = {}
@@ -126,7 +127,7 @@ def main():
     # generates graphs for x1,x2,x3,x4 and determines m1, m2
     generate_slopes(row_dictionary)
     # train(row_dictionary)
-    print("done1")
+    print("done12")
 
 
 if __name__ == '__main__':
