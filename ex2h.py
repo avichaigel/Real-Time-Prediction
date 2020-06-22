@@ -23,9 +23,18 @@ def create_feature_list(row):
     return features
 
 
+def sigmoid(x, deriv = False):
+    if deriv:
+        return x * (1 - x)
+    return 1 / (1 + np.exp(-x))
+
+
 def normalize(tr_samples, v_samples, test_samples):
     tr_length = len(tr_samples)
+    debug_counter = 0
     for tr_row in tr_samples:
+        if debug_counter == 405:
+            print(3)
         tr_features = create_feature_list(tr_row)
         mean_a, std_a = np.mean(tuple(tr_features[0])), np.std(tuple(tr_features[0]))
         mean_b, std_b = np.mean(tr_features[1]), np.std(tr_features[1])
@@ -36,6 +45,7 @@ def normalize(tr_samples, v_samples, test_samples):
             tr_row[i + 1] = (tr_row[i + 1] - mean_b) / std_b
             tr_row[i + 2] = (tr_row[i + 2] - mean_c) / std_c
             tr_row[i + 3] = (tr_row[i + 3] - mean_d) / std_d
+        debug_counter += 1
     for v_row in v_samples:
         for i in range(0, 120, 4):
             v_row[i] = (v_row[i] - mean_a) / std_a
@@ -48,8 +58,8 @@ def normalize(tr_samples, v_samples, test_samples):
             test_row[i + 1] = (test_row[i + 1] - mean_b) / std_b
             test_row[i + 2] = (test_row[i + 2] - mean_c) / std_c
             test_row[i + 3] = (test_row[i + 3] - mean_d) / std_d
+    print(np.argwhere(np.isnan(tr_samples)))
 
-        # column[i] = (column[i] - col_mean) / col_std
 
     # tr_features = create_feature_list(tr_samples)
     # v_features = create_feature_list(v_samples)
@@ -59,19 +69,6 @@ def normalize(tr_samples, v_samples, test_samples):
     # scale_c = pp.StandardScaler().fit(np.array(tr_features[2]).reshape(-1,1))
     # scale_d = pp.StandardScaler().fit(np.array(tr_features[3]).reshape(-1,1))
 
-    # for column in column_list:
-    #     col_mean = np.mean(column)
-    #     col_std = np.std(column)
-    #     length = len(column)
-    #     for i in range(length):
-    #         column[i] = (column[i] - col_mean) / col_std
-
-
-# def normalize_data(file):
-#     column_list, anomalies = create_columns(file)
-#     normalize(column_list)
-#     return column_list, anomalies
-
 
 def train(tr_samples, tr_anomalies, v_anomalies):
     gp = genetic.SymbolicRegressor(population_size=6, stopping_criteria=0.1, tournament_size=2,
@@ -80,6 +77,7 @@ def train(tr_samples, tr_anomalies, v_anomalies):
                                    p_point_mutation=0, p_point_replace=0, low_memory=False)
     gp.fit(tr_samples, tr_anomalies)
     gp.predict(v_anomalies)
+    # gp.score()
 
 
 def read_data(file):
@@ -94,7 +92,12 @@ def read_data(file):
             samples.append(line)
             if row_number == REQUIRED_ROW_LENGTH:
                 break
-    return np.array(samples).astype(np.float), anomalies
+        samples_len = len(samples)
+        for i in range(samples_len):
+            samples[i] = pd.to_numeric(samples[i])
+        return samples, anomalies
+    # return [float(i) for i in samples], anomalies
+    # return np.array(samples).astype(np.float), anomalies
 
 
 def main():
