@@ -13,9 +13,9 @@ def create_feature_list(row):
     length = len(row)
     for i in range(0, length, 4):
         feat_a.append(row[i])
-        feat_b.append(row[i+1])
-        feat_c.append(row[i+2])
-        feat_d.append(row[i+3])
+        feat_b.append(row[i + 1])
+        feat_c.append(row[i + 2])
+        feat_d.append(row[i + 3])
     features.append(feat_a)
     features.append(feat_b)
     features.append(feat_c)
@@ -31,17 +31,17 @@ def normalize(tr_samples, v_samples, test_samples):
         mean_b, std_b = np.mean(tr_features[1]), np.std(tr_features[1])
         mean_c, std_c = np.mean(tr_features[2]), np.std(tr_features[2])
         mean_d, std_d = np.mean(tr_features[3]), np.std(tr_features[3])
-        for i in range(0,120,4):
+        for i in range(0, 120, 4):
             tr_row[i] = (tr_row[i] - mean_a) / std_a
-            tr_row[i+1] = (tr_row[i+1] - mean_b) / std_b
-            tr_row[i+2] = (tr_row[i+2] - mean_c) / std_c
-            tr_row[i+3] = (tr_row[i+3] - mean_d) / std_d
+            tr_row[i + 1] = (tr_row[i + 1] - mean_b) / std_b
+            tr_row[i + 2] = (tr_row[i + 2] - mean_c) / std_c
+            tr_row[i + 3] = (tr_row[i + 3] - mean_d) / std_d
     for v_row in v_samples:
-        for i in range(0,120,4):
+        for i in range(0, 120, 4):
             v_row[i] = (v_row[i] - mean_a) / std_a
-            v_row[i+1] = (v_row[i+1] - mean_b) / std_b
-            v_row[i+2] = (v_row[i+2] - mean_c) / std_c
-            v_row[i+3] = (v_row[i+3] - mean_d) / std_d
+            v_row[i + 1] = (v_row[i + 1] - mean_b) / std_b
+            v_row[i + 2] = (v_row[i + 2] - mean_c) / std_c
+            v_row[i + 3] = (v_row[i + 3] - mean_d) / std_d
     for test_row in test_samples:
         for i in range(0, 120, 4):
             test_row[i] = (test_row[i] - mean_a) / std_a
@@ -58,10 +58,6 @@ def normalize(tr_samples, v_samples, test_samples):
     # scale_b = pp.StandardScaler().fit(np.array(tr_features[1]).reshape(-1,1))
     # scale_c = pp.StandardScaler().fit(np.array(tr_features[2]).reshape(-1,1))
     # scale_d = pp.StandardScaler().fit(np.array(tr_features[3]).reshape(-1,1))
-
-
-
-
 
     # for column in column_list:
     #     col_mean = np.mean(column)
