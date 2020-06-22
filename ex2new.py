@@ -29,7 +29,10 @@ def create_columns(file):
         for row in csv_f:
             row_number += 1
             line = row.split(",")
-            anomalies.append((line[0]))
+            if line[0].isnumeric():
+                anomalies.append(float(line[0]))
+            else:
+                anomalies.append((line[0]))
             for i in range(1, 121):
                 column_list[i - 1].append(float(line[i]))
             if row_number == REQUIRED_ROW_LENGTH:
@@ -73,6 +76,8 @@ def train(tr_samples, tr_anomalies, v_anomalies):
                                    const_range=(-10, 10), function_set=('add', 'sub', 'mul', 'div'),
                                    p_crossover=0.5, p_subtree_mutation=0, p_hoist_mutation=0,
                                    p_point_mutation=0, p_point_replace=0, low_memory=False)
+    tr_samples = np.array(tr_samples).transpose()
+    v_anomalies = np.array(v_anomalies).reshape(1,-1)
     gp.fit(tr_samples, tr_anomalies)
     gp.predict(v_anomalies)
     # gp.score()
@@ -90,6 +95,11 @@ def normalize_data(tr_samples, v_samples, test_samples):
     v_samples = scaler.transform(v_samples)
     test_samples = scaler.transform(test_samples)
     return tr_samples, v_samples, test_samples
+
+
+# def read_data2(file):
+#     samples = pd.read_csv(file, nrows=REQUIRED_ROW_LENGTH)
+#     print(2)
 
 
 def main():
