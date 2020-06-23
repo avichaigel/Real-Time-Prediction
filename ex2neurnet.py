@@ -7,7 +7,8 @@ from sys import argv
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
-REQUIRED_ROW_LENGTH = 10000
+REQUIRED_ROW_LENGTH = 1000
+
 
 class NeuralNetwork:
 
@@ -16,7 +17,7 @@ class NeuralNetwork:
         self.inputs = inputs
         self.outputs = outputs
         # initialize weights as .50 for simplicity
-        self.weights = np.array([[.50]]*120)
+        self.weights = np.array([[0.5]] * 120)
         self.error_history = []
         self.epoch_list = []
 
@@ -95,7 +96,7 @@ def main():
     tr_samples, v_samples, test_samples = normalize_data(tr_samples, v_samples, test_samples)
 
     neural_net = NeuralNetwork(tr_samples, tr_anomalies)
-    neural_net.train(1000)
+    neural_net.train(50000)
     print(neural_net.predict(v_samples))
 
     # plot the error over the entire training duration

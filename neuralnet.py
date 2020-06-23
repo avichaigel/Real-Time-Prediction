@@ -1,7 +1,7 @@
 import numpy as np  # helps with the math
 import matplotlib.pyplot as plt  # to plot error during training
 
-TRAIN_GENS = 1000
+TRAIN_GENS = 25000
 
 # input data
 inputs = np.array([[0, 1, 0],
