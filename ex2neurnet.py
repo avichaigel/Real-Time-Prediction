@@ -7,7 +7,7 @@ from sys import argv
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
-REQUIRED_ROW_LENGTH = 1000
+REQUIRED_ROW_LENGTH = 10000
 
 class NeuralNetwork:
 
@@ -24,7 +24,7 @@ class NeuralNetwork:
     def sigmoid(self, x, deriv=False):
         if deriv == True:
             return x * (1 - x)
-        exp = np.exp(-x) #todo values here are funky, fix it
+        exp = np.exp(-x)
         return 1 / (1 + exp)
 
     # data will flow through the neural network.
@@ -55,7 +55,6 @@ class NeuralNetwork:
 
 
 def create_rows(file):
-    # create list of 120 lists, each one will represent a column
     row_list, anomalies = [], []
     row_number = 0
     # fill lists with the columns
@@ -98,6 +97,13 @@ def main():
     neural_net = NeuralNetwork(tr_samples, tr_anomalies)
     neural_net.train(1000)
     print(neural_net.predict(v_samples))
+
+    # plot the error over the entire training duration
+    plt.figure(figsize=(15, 5))
+    plt.plot(neural_net.epoch_list, neural_net.error_history)
+    plt.xlabel('Epoch')
+    plt.ylabel('Error')
+    plt.show()
 
 
 if __name__ == '__main__':
