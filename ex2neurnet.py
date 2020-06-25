@@ -96,7 +96,7 @@ def main():
     tr_samples, v_samples, test_samples = normalize_data(tr_samples, v_samples, test_samples)
 
     neural_net = NeuralNetwork(tr_samples, tr_anomalies)
-    neural_net.train(50000)
+    neural_net.train(100000)
     print(neural_net.predict(v_samples))
 
     # plot the error over the entire training duration
