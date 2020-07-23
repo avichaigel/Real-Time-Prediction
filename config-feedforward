@@ -1,10 +1,9 @@
-#--- parameters for the XOR-2 experiment ---#
 
 [NEAT]
 fitness_criterion     = max
-fitness_threshold     = 0.0
-pop_size              = 200
-reset_on_extinction   = True
+fitness_threshold     = 500
+pop_size              = 10
+reset_on_extinction   = False
 
 [DefaultGenome]
 # node activation options
@@ -23,7 +22,7 @@ bias_init_stdev         = 1.0
 bias_max_value          = 30.0
 bias_min_value          = -30.0
 bias_mutate_power       = 0.5
-bias_mutate_rate        = 0.1
+bias_mutate_rate        = 0.7
 bias_replace_rate       = 0.1
 
 # genome compatibility options
@@ -42,23 +41,22 @@ feed_forward            = True
 initial_connection      = full_direct
 
 # node add/remove rates
-node_add_prob           = 0.1
-node_delete_prob        = 0.1
+node_add_prob           = 0.2
+node_delete_prob        = 0.2
 
 # network parameters
-num_hidden              = 0
+num_hidden              = 2
 num_inputs              = 120
 num_outputs             = 1
 
 # node response options
-response_init_mean      = 0.0
-response_init_stdev     = 1.0
+response_init_mean      = 1.0
+response_init_stdev     = 0.0
 response_max_value      = 30.0
 response_min_value      = -30.0
-#maybe change the following 3 values all to 0.0
-response_mutate_power   = 0.5
-response_mutate_rate    = 0.1
-response_replace_rate   = 0.01
+response_mutate_power   = 0.0
+response_mutate_rate    = 0.0
+response_replace_rate   = 0.0
 
 # connection weight options
 weight_init_mean        = 0.0
@@ -66,8 +64,8 @@ weight_init_stdev       = 1.0
 weight_max_value        = 30
 weight_min_value        = -30
 weight_mutate_power     = 0.5
-weight_mutate_rate      = 0.1
-weight_replace_rate     = 0.01
+weight_mutate_rate      = 0.8
+weight_replace_rate     = 0.1
 
 [DefaultSpeciesSet]
 compatibility_threshold = 3.0
@@ -80,4 +78,3 @@ species_elitism      = 2
 [DefaultReproduction]
 elitism            = 2
 survival_threshold = 0.2
-
