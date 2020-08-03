@@ -9,7 +9,6 @@ from sklearn.preprocessing import StandardScaler
 import visualize
 import numpy as np
 import random
-import pandas as pd
 
 REQUIRED_ROW_LENGTH = 1000
 

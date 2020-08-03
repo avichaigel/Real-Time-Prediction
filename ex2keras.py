@@ -5,33 +5,41 @@ import keras
 import random
 import numpy as np
 
+from numpy import loadtxt
+import tensorflow as tf
+from keras.models import Sequential
+from keras.layers import Dense, Activation
+from keras.optimizers import Adam
+from keras.metrics import categorical_crossentropy
+
+
 REQUIRED_ROW_LENGTH = 1000
 UNDEFINED = -1
 
-
-class SamplesNet(nn.Module):
-
-    def __init__(self, input_size, hidden1_size, hidden2_size, num_classes):
-        super(SamplesNet, self).__init__()
-        self.fc1 = nn.Linear(input_size, hidden1_size)
-        self.relu1 = nn.ReLU()
-        self.fc2 = nn.Linear(hidden1_size, hidden2_size)
-        self.relu2 = nn.ReLU()
-        self.fc3 = nn.Linear(hidden2_size, num_classes)
-        self.sigmoid = nn.Sigmoid()
-        # self._TP = UNDEFINED
-        # self._FP = UNDEFINED
-        # self._FN = UNDEFINED
-        # self._F025 = UNDEFINED
-
-    def forward(self, x):
-        out = self.fc1(x)
-        out = self.relu1(out)
-        out = self.fc2(out)
-        out = self.relu2(out)
-        out = self.fc3(out)
-        out = self.sigmoid(out)
-        return out
+#
+# class SamplesNet(nn.Module):
+#
+#     def __init__(self, input_size, hidden1_size, hidden2_size, num_classes):
+#         super(SamplesNet, self).__init__()
+#         self.fc1 = nn.Linear(input_size, hidden1_size)
+#         self.relu1 = nn.ReLU()
+#         self.fc2 = nn.Linear(hidden1_size, hidden2_size)
+#         self.relu2 = nn.ReLU()
+#         self.fc3 = nn.Linear(hidden2_size, num_classes)
+#         self.sigmoid = nn.Sigmoid()
+#         # self._TP = UNDEFINED
+#         # self._FP = UNDEFINED
+#         # self._FN = UNDEFINED
+#         # self._F025 = UNDEFINED
+#
+#     def forward(self, x):
+#         out = self.fc1(x)
+#         out = self.relu1(out)
+#         out = self.fc2(out)
+#         out = self.relu2(out)
+#         out = self.fc3(out)
+#         out = self.sigmoid(out)
+#         return out
 
 
 class Sample:
@@ -322,8 +330,40 @@ def f_025(tp, fp, fn):
 def diff_loss(output, target):
     return target - output
 
+def update_vals(nets_population, row_tensor, net_l, actual_res, net_TP, net_FP, net_FN):
+    net = nets_population[0]
+    net_output = net(row_tensor)
+    net_l.append(net_output)
+    net_output = predict(net_output)
+    if net_output == 1 and actual_res == 1:
+        net_TP += 1
+    if net_output == 0 and actual_res == 1:
+        net_FP += 1
+    if net_output == 1 and actual_res == 0:
+        net_FN += 1
+    return net_FN, net_FP, net_TP
+
+
+def calc_loss(best_net, row_tensor, actual_res, mutation_loss, loss):
+    output = best_net(row_tensor)
+    actual_res_tensor = torch.tensor([actual_res], dtype=torch.float32)
+    mutation_loss += loss(output, actual_res_tensor)
+    return mutation_loss
+
+
+def mutate(mutation_loss, optimizer, best, orig_best, nets_population):
+    mutation_loss.backward()  # Calculate the gradients with help of back propagation
+    optimizer.step()  # Ask the optimizer to adjust the parameters based on the gradients
+    optimizer.zero_grad()  # Clear off the gradients from any past operation
+    mutation = best.get_best()
+    best_net = orig_best.get_best()
+    nets_population.append(mutation)
+    return mutation_loss, optimizer, mutation, best_net, nets_population
+
+def neural_net
 
 def main():
+
     row_dictionary = {}
     read_data(row_dictionary)
     normalize_data(row_dictionary)
@@ -339,7 +379,7 @@ def main():
     loss = nn.MSELoss()
     # Our optimizer
     learning_rate = 0.01
-    optimizer = torch.optim.SGD(net1.parameters(), lr=learning_rate, nesterov=True, momentum=0.9, dampening=0)
+    # optimizer = torch.optim.SGD(net1.parameters(), lr=learning_rate, nesterov=True, momentum=0.9, dampening=0)
     # optimizer2 = torch.optim.SGD(net2.parameters(), lr=learning_rate)
     # optimizer3 = torch.optim.SGD(net3.parameters(), lr=learning_rate)
     # optimizer4 = torch.optim.SGD(net4.parameters(), lr=learning_rate)
@@ -370,11 +410,7 @@ def main():
         file_mutation_2_limit = file_mutation_1_limit + file_mutation_limit
         file_mutation_3_limit = file_mutation_2_limit + file_mutation_limit
 
-        net1_l = []
-        net2_l = []
-        net3_l = []
-        net4_l = []
-        net5_l = []
+        net1_l, net2_l, net3_l, net4_l, net5_l = [], [], [], [], []
         file_counter = 0
         for row_data in row_dictionary:
             # calculate fitness and determine best
@@ -382,56 +418,16 @@ def main():
             actual_res = int(row_dictionary[row_data])
 
             if file_counter < file_partition:
-                net1 = nets_population[0]
-                net1_output = net1(row_tensor)
-                net1_l.append(net1_output)
-                net1_output = predict(net1_output)
-                if net1_output == 1 and actual_res == 1:
-                    net1_TP += 1
-                if net1_output == 0 and actual_res == 1:
-                    net1_FP += 1
-                if net1_output == 1 and actual_res == 0:
-                    net1_FN += 1
-                net2 = nets_population[1]
-                net2_output = net2(row_tensor)
-                net2_l.append(net2_output)
-                net2_output = predict(net2_output)
-                if net2_output == 1 and actual_res == 1:
-                    net2_TP += 1
-                if net2_output == 0 and actual_res == 1:
-                    net2_FP += 1
-                if net2_output == 1 and actual_res == 0:
-                    net2_FN += 1
-                net3 = nets_population[2]
-                net3_output = net3(row_tensor)
-                net3_l.append(net3_output)
-                net3_output = predict(net3_output)
-                if net3_output == 1 and actual_res == 1:
-                    net3_TP += 1
-                if net3_output == 0 and actual_res == 1:
-                    net3_FP += 1
-                if net3_output == 1 and actual_res == 0:
-                    net3_FN += 1
-                net4 = nets_population[3]
-                net4_output = net4(row_tensor)
-                net4_l.append(net4_output)
-                net4_output = predict(net4_output)
-                if net4_output == 1 and actual_res == 1:
-                    net4_TP += 1
-                if net4_output == 0 and actual_res == 1:
-                    net4_FP += 1
-                if net4_output == 1 and actual_res == 0:
-                    net4_FN += 1
-                net5 = nets_population[4]
-                net5_output = net5(row_tensor)
-                net5_l.append(net5_output)
-                net5_output = predict(net5_output)
-                if net5_output == 1 and actual_res == 1:
-                    net5_TP += 1
-                if net5_output == 0 and actual_res == 1:
-                    net5_FP += 1
-                if net5_output == 1 and actual_res == 0:
-                    net5_FN += 1
+                net1_FN, net1_FP, net1_TP = update_vals(nets_population, row_tensor, net1_l, actual_res,
+                                                        net1_TP, net1_FP, net1_FN)
+                net2_FN, net2_FP, net2_TP = update_vals(nets_population, row_tensor, net2_l, actual_res,
+                                                        net2_TP, net2_FP, net2_FN)
+                net3_FN, net3_FP, net3_TP = update_vals(nets_population, row_tensor, net3_l, actual_res,
+                                                        net3_TP, net3_FP, net3_FN)
+                net4_FN, net4_FP, net4_TP = update_vals(nets_population, row_tensor, net4_l, actual_res,
+                                                        net4_TP, net4_FP, net4_FN)
+                net5_FN, net5_FP, net5_TP = update_vals(nets_population, row_tensor, net5_l, actual_res,
+                                                        net5_TP, net5_FP, net5_FN)
 
             elif file_counter == file_partition:
                 net_1_F025 = f_025(net1_TP, net1_FP, net1_FN)
@@ -466,9 +462,7 @@ def main():
 
             # 1
             elif file_counter < file_mutation_1_limit and file_counter > file_partition:
-                output = best_net(row_tensor)
-                actual_res_tensor = torch.tensor([actual_res], dtype=torch.float32)
-                mutation_1_loss += loss(output, actual_res_tensor)
+                mutation_1_loss = calc_loss(best_net, row_tensor, actual_res, mutation_1_loss, loss)
 
                 # if (output == 1 and actual_res == 1) or (output == 0 and actual_res == 0):
                 #     mutation_1_correct += 1
@@ -478,54 +472,37 @@ def main():
                 # accuracy = mutation_1_correct / (file_mutation_1_limit - file_partition)
                 # l = loss(torch.tensor([accuracy]), torch.tensor([1]))  # Calculate the loss,
                 # how many correct answers are in the distance of one mutation size
-                mutation_1_loss.backward()  # Calculate the gradients with help of back propagation
-                optimizer.step()  # Ask the optimizer to adjust the parameters based on the gradients
-                optimizer.zero_grad()  # Clear off the gradients from any past operation
-                mutation_1 = best.get_best()
-                best_net = orig_best.get_best()
-                nets_population.append(mutation_1)
+                mutation_1_loss, optimizer, mutation, best_net, nets_population = mutate(mutation_1_loss, optimizer,
+                                                                                         best, orig_best, nets_population)
+
             # 2
             elif file_counter < file_mutation_2_limit and file_counter > file_mutation_1_limit:
-                output = best_net(row_tensor)
-                actual_res_tensor = torch.tensor([actual_res], dtype=torch.float32)
-                mutation_2_loss += loss(output, actual_res_tensor)
+                mutation_2_loss = calc_loss(best_net, row_tensor, actual_res, mutation_2_loss, loss)
+
 
             elif file_counter == file_mutation_2_limit:
-                mutation_2_loss.backward()  # Calculate the gradients with help of back propagation
-                optimizer.step()  # Ask the optimizer to adjust the parameters based on the gradients
-                optimizer.zero_grad()  # Clear off the gradients from any past operation
-                mutation_2 = best.get_best()
-                best_net = orig_best.get_best()
-                nets_population.append(mutation_2)
+                mutation_2_loss, optimizer, mutation, best_net, nets_population = mutate(mutation_2_loss, optimizer,
+                                                                                         best, orig_best,
+                                                                                         nets_population)
 
             # 3
             elif file_counter < file_mutation_3_limit and file_counter > file_mutation_2_limit:
-                output = best_net(row_tensor)
-                actual_res_tensor = torch.tensor([actual_res], dtype=torch.float32)
-                mutation_3_loss += loss(output, actual_res_tensor)
+                mutation_3_loss = calc_loss(best_net, row_tensor, actual_res, mutation_3_loss, loss)
+
 
             elif file_counter == file_mutation_3_limit:
-                mutation_3_loss.backward()  # Calculate the gradients with help of back propagation
-                optimizer.step()  # Ask the optimizer to adjust the parameters based on the gradients
-                optimizer.zero_grad()  # Clear off the gradients from any past operation
-                mutation_3 = best.get_best()
-                best_net = orig_best.get_best()
-                nets_population.append(mutation_3)
+                mutation_3_loss, optimizer, mutation, best_net, nets_population = mutate(mutation_3_loss, optimizer,
+                                                                                         best, orig_best,
+                                                                                         nets_population)
 
             # 4
             elif file_counter < REQUIRED_ROW_LENGTH - 1 and file_counter > file_mutation_3_limit:
-                output = best_net(row_tensor)
-                actual_res_tensor = torch.tensor([actual_res], dtype=torch.float32)
-                mutation_4_loss += loss(output, actual_res_tensor)
-
+                mutation_4_loss = calc_loss(best_net, row_tensor, actual_res, mutation_2_loss, loss)
 
             elif file_counter == REQUIRED_ROW_LENGTH - 1:
-                mutation_4_loss.backward()  # Calculate the gradients with help of back propagation
-                optimizer.step()  # Ask the optimizer to adjust the parameters based on the gradients
-                optimizer.zero_grad()  # Clear off the gradients from any past operation
-                mutation_4 = best.get_best()
-                best_net = orig_best.get_best()
-                nets_population.append(mutation_4)
+                mutation_4_loss, optimizer, mutation, best_net, nets_population = mutate(mutation_4_loss, optimizer,
+                                                                                         best, orig_best,
+                                                                                         nets_population)
 
             file_counter += 1
 
